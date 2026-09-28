@@ -76,6 +76,99 @@ const result = calculateSalaryTax({
 calculateSalaryTax({monthlySalary: 250_000, taxYear: '2026-27'}); // same result
 ```
 
+## Examples
+
+### Payslip: monthly tax and take-home pay
+
+```ts
+import {calculateSalaryTax} from 'pk-tax';
+
+const pkr = (n: number) => `Rs ${n.toLocaleString('en-PK')}`;
+const r = calculateSalaryTax({monthlySalary: 350_000, taxYear: '2026-27'});
+
+console.log(`Gross     ${pkr(350_000)}`); // Gross     Rs 350,000
+console.log(`Tax       ${pkr(r.monthlyTax)}`); // Tax       Rs 47,500
+console.log(`Take-home ${pkr(r.monthlyNetIncome)}`); // Take-home Rs 302,500
+console.log(`${(r.effectiveTaxRate * 100).toFixed(2)}% effective`); // 13.57% effective
+```
+
+### Compare the same salary across tax years
+
+```ts
+import {calculateSalaryTax} from 'pk-tax';
+
+for (const annualSalary of [1_800_000, 3_600_000, 6_000_000, 12_000_000]) {
+  const before = calculateSalaryTax({annualSalary, taxYear: '2025-26'});
+  const after = calculateSalaryTax({annualSalary, taxYear: '2026-27'});
+  console.log(annualSalary, before.annualTax - after.annualTax);
+}
+// 1800000   0       — same slabs up to Rs 2.2M
+// 3600000   50000
+// 6000000   177000
+// 12000000  511290  — includes the 2025-26 surcharge, withdrawn in 2026-27
+```
+
+### Tax year picker from user input
+
+```ts
+import {getSupportedTaxYears, isSupportedTaxYear} from 'pk-tax';
+
+getSupportedTaxYears(); // ['2025-26', '2026-27'] — fill a <select> with these
+
+const year = new URLSearchParams(location.search).get('year');
+if (!isSupportedTaxYear(year)) {
+  // '2027-28', 'abc', null … → ask the user to choose; never guess a year
+}
+```
+
+### Show the slab table
+
+```ts
+import {getTaxRules, getTaxSlabs} from 'pk-tax';
+
+for (const {over, upTo, rate} of getTaxSlabs({taxYear: '2026-27'})) {
+  console.log(`${over} – ${upTo ?? 'and above'}: ${rate * 100}%`);
+}
+// 0 – 600000: 0%
+// 600000 – 1200000: 1%
+// …
+// 7000000 – and above: 35%
+
+getTaxRules('2026-27').source.url; // link your users to FBR's rate card
+```
+
+### Handle bad input in a form
+
+```ts
+import {calculateSalaryTax, PkTaxError} from 'pk-tax';
+
+try {
+  calculateSalaryTax({annualSalary: Number(form.salary), taxYear: form.year});
+} catch (error) {
+  if (!(error instanceof PkTaxError)) throw error;
+  switch (error.code) {
+    case 'INVALID_INCOME': // negative, NaN, or above Rs 1 trillion
+    case 'UNSUPPORTED_TAX_YEAR': // e.g. '2027-28' before it is added
+    case 'INVALID_INPUT': // no salary, or both annual and monthly
+      showFieldError(error.message);
+  }
+}
+```
+
+### More runnable examples
+
+The [`examples/`](https://github.com/Aqsa-Hamza-Projects/pk-tax/tree/main/examples)
+folder on GitHub has complete scripts you can run with `npm run examples`:
+
+| File                                                                                                            | Shows                                              |
+| --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| [`01-salary-tax.ts`](https://github.com/Aqsa-Hamza-Projects/pk-tax/blob/main/examples/01-salary-tax.ts)         | Three salaries across every supported tax year     |
+| [`02-monthly-salary.ts`](https://github.com/Aqsa-Hamza-Projects/pk-tax/blob/main/examples/02-monthly-salary.ts) | Monthly salary input, monthly tax and take-home    |
+| [`03-inspect-rules.ts`](https://github.com/Aqsa-Hamza-Projects/pk-tax/blob/main/examples/03-inspect-rules.ts)   | Slab table, surcharge rule and FBR source metadata |
+| [`04-error-handling.ts`](https://github.com/Aqsa-Hamza-Projects/pk-tax/blob/main/examples/04-error-handling.ts) | Validating a tax year and catching typed errors    |
+| [`05-commonjs.cjs`](https://github.com/Aqsa-Hamza-Projects/pk-tax/blob/main/examples/05-commonjs.cjs)           | Plain `require()` from CommonJS                    |
+| [`06-esm.mjs`](https://github.com/Aqsa-Hamza-Projects/pk-tax/blob/main/examples/06-esm.mjs)                     | Plain `import` from an ES module                   |
+
 ## Supported tax years
 
 Pakistan's tax year runs 1 July – 30 June. pk-tax names it `"2026-27"`; FBR
