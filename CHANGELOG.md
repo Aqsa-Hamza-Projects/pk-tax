@@ -12,6 +12,24 @@ corrects tax rules must say which tax year changed and cite the FBR source.
 
 ## [Unreleased]
 
+## [0.0.2] — 2026-09-28
+
+### Added
+
+- README **Examples** section: a payslip (monthly tax and take-home), the
+  same salary compared across tax years, a tax-year picker for user input,
+  printing the slab table, and handling errors in a form — plus links to the
+  runnable scripts in `examples/`.
+- README install commands for pnpm, yarn and bun, and a note on ESM and
+  CommonJS usage.
+
+### Fixed
+
+- `require('pk-tax/package.json')` (and the ESM equivalent) now works. The
+  `exports` map only exposed `"."`, so tooling that reads a dependency's
+  `package.json` — version checkers, React Native's Metro, some bundler
+  plugins — failed with `ERR_PACKAGE_PATH_NOT_EXPORTED`.
+
 ## [0.0.1] — 2026-09-28
 
 First release.

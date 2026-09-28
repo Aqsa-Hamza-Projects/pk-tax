@@ -1,7 +1,7 @@
 {
   "name": "pk-tax",
-  "version": "0.0.1",
-  "description": "Pakistan income tax calculator for salaried individuals — versioned FBR tax-year rules (2025-26, 2026-27), progressive slabs, surcharge, monthly/annual tax, net salary, effective and marginal rates. Zero-dependency TypeScript engine for payroll, HR and fintech apps.",
+  "version": "0.0.2",
+  "description": "Pakistan income tax calculator for salaried individuals \u2014 versioned FBR tax-year rules (2025-26, 2026-27), progressive slabs, surcharge, monthly/annual tax, net salary, effective and marginal rates. Zero-dependency TypeScript engine for payroll, HR and fintech apps.",
   "keywords": [
     "pakistan",
     "pakistani",
@@ -39,7 +39,8 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -50,7 +51,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "node init && tsup",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",

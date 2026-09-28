@@ -40,6 +40,13 @@ describe('examples', () => {
     );
   });
 
+  it('exposes package.json to tooling that reads pk-tax/package.json', () => {
+    // Version checkers, Metro and some bundler plugins do this; without an
+    // exports entry Node throws ERR_PACKAGE_PATH_NOT_EXPORTED.
+    const script = "console.log(require('pk-tax/package.json').name)";
+    expect(run('node', ['-e', script]).trim()).toBe('pk-tax');
+  });
+
   it('06-esm.mjs computes the right tax via import', () => {
     expect(run('node', ['examples/06-esm.mjs'])).toContain('276000');
   });
