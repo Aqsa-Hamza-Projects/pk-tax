@@ -24,6 +24,30 @@ each budget.
 npm install pk-tax
 ```
 
+```sh
+pnpm add pk-tax
+```
+
+```sh
+yarn add pk-tax
+```
+
+```sh
+bun add pk-tax
+```
+
+Works with both module systems — `import` gets the ES module build, `require()`
+gets the CommonJS build, and TypeScript types resolve in every
+`moduleResolution` mode (`node10`, `node16`, `bundler`):
+
+```ts
+import {calculateSalaryTax} from 'pk-tax'; // ESM
+```
+
+```js
+const {calculateSalaryTax} = require('pk-tax'); // CommonJS
+```
+
 ## Quick start
 
 ```ts
